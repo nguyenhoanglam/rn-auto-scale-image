@@ -1,6 +1,6 @@
 {
   "name": "rn-auto-scale-image",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "This component is based on React Native's Image but can scale its width or height automatically to keep the image's aspect ratio.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
