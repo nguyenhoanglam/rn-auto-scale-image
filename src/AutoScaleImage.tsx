@@ -5,21 +5,34 @@ import {
   Image,
   ImageBackground,
 } from 'react-native';
-import type { ImageProps } from 'react-native';
+import PlaceholderImage from './PlaceholderImage';
+
+import type { ReactElement } from 'react';
+import type {
+  ViewStyle,
+  ImageStyle,
+  StyleProp,
+  ImageProps,
+  ImageBackgroundProps,
+  ImageSourcePropType,
+} from 'react-native';
 
 interface Size {
   width: number;
   height: number;
 }
 
-interface AutoScaleImageProps extends ImageProps {
+interface AutoScaleImageProps extends ImageBackgroundProps {
+  style?: StyleProp<ImageStyle> | StyleProp<ViewStyle> | undefined;
   isBackground?: boolean;
+  loadingComponent?: ReactElement | undefined;
+  fallbackComponent?: ReactElement | undefined;
   activeOpacity?: number;
   onPress?: () => void;
   onSize?: (size: Size) => void;
 }
 
-function getSourceURI(source: ImageProps['source']): string | undefined {
+export function getSourceURI(source: ImageProps['source']): string | undefined {
   if (typeof source === 'number') return undefined;
 
   return Array.isArray(source) ? source[0]?.uri : source.uri;
@@ -31,12 +44,15 @@ const AutoScaleImage: React.FC<AutoScaleImageProps> = ({
   height,
   style,
   isBackground,
+  loadingComponent,
+  fallbackComponent,
   activeOpacity,
   onPress,
   onSize,
   ...restProps
 }) => {
   const mountedRef = useRef(false);
+  const lastScaledSourceRef = useRef<ImageSourcePropType>();
 
   const [scaleSize, setScaleSize] = useState<Size | undefined>();
 
@@ -44,8 +60,6 @@ const AutoScaleImage: React.FC<AutoScaleImageProps> = ({
     style,
     scaleSize && { width: scaleSize.width, height: scaleSize.height },
   ]);
-
-  const imageKey = getSourceURI(source) || Date.now().toString();
 
   useEffect(() => {
     mountedRef.current = true;
@@ -58,6 +72,8 @@ const AutoScaleImage: React.FC<AutoScaleImageProps> = ({
   useEffect(() => {
     const updateScaleSize = (w: number | undefined, h: number | undefined) => {
       if (mountedRef.current) {
+        lastScaledSourceRef.current = source;
+
         if (w === undefined || h === undefined) {
           setScaleSize(undefined);
         } else {
@@ -112,18 +128,24 @@ const AutoScaleImage: React.FC<AutoScaleImageProps> = ({
     fetchSourceImageSize();
   }, [source, width, height, onSize]);
 
-  const ImageComponent = (
-    isBackground ? ImageBackground : Image
-  ) as React.ComponentType<any>;
+  const ImageComponent =
+    loadingComponent || fallbackComponent
+      ? PlaceholderImage
+      : ((isBackground ? ImageBackground : Image) as React.ComponentType<any>);
+
+  if (lastScaledSourceRef.current !== source) {
+    return null;
+  }
 
   if (onPress) {
     return (
       <TouchableOpacity activeOpacity={activeOpacity} onPress={onPress}>
         <ImageComponent
-          key={imageKey}
+          {...restProps}
           source={source}
           style={imageStyle}
-          {...restProps}
+          loadingComponent={loadingComponent}
+          fallbackComponent={fallbackComponent}
         />
       </TouchableOpacity>
     );
@@ -131,10 +153,11 @@ const AutoScaleImage: React.FC<AutoScaleImageProps> = ({
 
   return (
     <ImageComponent
-      key={imageKey}
+      {...restProps}
       source={source}
       style={imageStyle}
-      {...restProps}
+      loadingComponent={loadingComponent}
+      fallbackComponent={fallbackComponent}
     />
   );
 };

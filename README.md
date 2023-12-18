@@ -2,6 +2,8 @@
 
 This component is based on React Native's `Image` but can scale its width or height automatically to keep the image's aspect ratio. It is useful when we don't know the aspect ratio in advance but want to display the entire image and limit it only by width or height.
 
+The loading and fallback components are also available to be displayed depending on the loading state.
+
 ## Installation
 
 #### Using Yarn
@@ -30,6 +32,7 @@ import AutoScaleImage from 'rn-auto-scale-image';
         uri: 'https://reactnative.dev/img/logo-og.png',
     }}
     width={Dimensions.get('screen').width}
+    loadingComponent={<ActivityIndicator />}
 />
 
 ```
@@ -58,6 +61,20 @@ Set to `true` to use the component as an `ImageBackground`.
 
 ----
 
+#### `loadingComponent?: ReactElement | undefined`
+
+The component that will be displayed on load start.
+
+----
+
+#### `fallbackComponent?: ReactElement | undefined`
+
+The component that will be displayed on load error.
+
+**NOTE**: `loadingComponent` and `fallbackComponent` is only displayed after the scaled size is calculated. It's wrapped and centered inside a `View` with the size equals the scaled size.
+
+----
+
 #### `activeOpacity?: number`
 
 The opacity of the component when touch is active. This prop will be ignored if `onPress` prop is `undefined`.
@@ -76,7 +93,7 @@ The callback that invoked when the component size is calculated.
 
 ----
 
-#### All other props are the same as [`Image`](https://reactnative.dev/docs/image) props.
+#### All other props are the same as [`ImageBackground`](https://reactnative.dev/docs/imagebackground) props which extends from [`Image`](https://reactnative.dev/docs/image) props.
 
 ## Author
 

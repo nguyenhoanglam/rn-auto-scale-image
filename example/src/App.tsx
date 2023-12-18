@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
   TouchableOpacity,
   View,
   Text,
@@ -18,26 +19,25 @@ const URIS = [
 ];
 
 export default function App() {
-  const [uriIndex, setUriIndex] = useState(0);
+  const [index, setIndex] = useState(0);
 
   const handlePreviousImage = () => {
-    setUriIndex((uriIndex - 1 + URIS.length) % URIS.length);
+    setIndex((index - 1 + URIS.length) % URIS.length);
   };
 
   const handleNextImage = () => {
-    setUriIndex((uriIndex + 1) % URIS.length);
+    setIndex((index + 1) % URIS.length);
   };
 
   return (
     <View style={styles.container}>
       <AutoScaleImage
         source={{
-          uri: URIS[uriIndex],
+          uri: URIS[index],
         }}
         width={Dimensions.get('screen').width}
-        onSize={(size) => {
-          console.log('Size: ', size);
-        }}
+        loadingComponent={<ActivityIndicator />}
+        fallbackComponent={<Text>Failed to load image</Text>}
       />
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={handlePreviousImage} style={styles.button}>
@@ -56,6 +56,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  placeholderImage: {
+    width: 64,
+    height: 64,
   },
   buttonContainer: {
     position: 'absolute',
