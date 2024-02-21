@@ -4,6 +4,8 @@ This component is based on React Native's `Image` but can scale its width or hei
 
 The loading and fallback components are also available to be displayed depending on the loading state.
 
+<img src="https://i.imgur.com/8LWiJUp.gif"  height="500">
+
 ## Installation
 
 #### Using Yarn
